@@ -12,7 +12,8 @@ import java.net.URL;
 public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
     private  double previousError = 0;
-    private  double dt = 0.2;
+    private  double integralError = 0;
+    private  double dt = 0.25;
 
 
     protected boolean SendValue(String value) {
@@ -39,14 +40,20 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
     public void Regulate(double currValue, double expectedValue)
     {
         double error = expectedValue-currValue;
-        double kp = 0.25;
-        double kd = 0;
+        double kp = 1;
+        double kd = 0.1;
+        double ki = 0.5;
 
         double proportionalError = kp*error;
         double derivativeError = kd*(error-previousError)/dt;
+
+
+        integralError = integralError+ error*dt;
+        double intError = ki* integralError;
         previousError = error;
 
-        double output = proportionalError+derivativeError;
+        double output = proportionalError+derivativeError +intError;
+
         if(output>100)
         {
             output=100;
@@ -55,6 +62,8 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
         {
             output = 0;
         }
+
+        Log.e("LUMEN", String.valueOf(output));
 
         SendValue(Double.toString(output));
     }
