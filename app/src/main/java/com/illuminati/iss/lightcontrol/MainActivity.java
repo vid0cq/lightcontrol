@@ -63,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 @Override
                 public void run() {
                     callapis.Regulate(value, 30);
+                    try {
+                        Thread.sleep(250);
+                    }
+                    catch (Exception e) {}
                 }
             };
 
