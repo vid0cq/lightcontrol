@@ -107,18 +107,22 @@ public class LightService extends Service implements SensorEventListener {
         {
             Log.i("LIGHTSERVICE", "ligh sensor is "+ event.values[0]);
 
-//            final Float value = event.values[0];
+            final Float value = event.values[0];
 
-//
-//            Runnable apiRunnable = new Runnable() {
-//                @Override
-//                public void run() {
-//                    callAPIs.Regulate(value, 30);
-//                }
-//            };
-//
-//            Thread thread = new Thread(apiRunnable);
-//            thread.start();
+
+            Runnable apiRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    callAPIs.Regulate(value, 30);
+                    try {
+                        Thread.sleep(1000);
+                    }
+                    catch (Exception e) {}
+                }
+            };
+
+            Thread thread = new Thread(apiRunnable);
+            thread.start();
         }
     }
 

@@ -1,12 +1,16 @@
 package com.illuminati.iss.lightcontrol;
 
+import android.app.ActivityManager;
 import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,25 +21,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     SensorManager sensorManager;
     Sensor sensor;
     TextView tvLux;
-    CallAPIs callapis = new CallAPIs();
+    LightService lightService;
+    Intent ligthServiceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        lightService = new LightService(this);
+        ligthServiceIntent = new Intent(this,lightService.getClass());
         tvLux = (TextView) findViewById(R.id.tvLux);
         sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-
-//        try{
-//            UDPClient.send();
-//        }
-//        catch (Exception e)
-//        {
-//            Toast.makeText(this,e.toString(),1000);
-//        }
-
+        if(!isMyServiceRunning(lightService.getClass()))
+            startService(ligthServiceIntent);
     }
 
     @Override
@@ -51,27 +52,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
+    protected void onDestroy(){
+        stopService(ligthServiceIntent);
+        Log.i("MAINACT", "onDestroy!");
+        super.onDestroy();
+    }
+
+    @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType()==Sensor.TYPE_LIGHT)
-        {
-            tvLux.setText(""+event.values[0]);
-
-            final Float value = event.values[0];
-
-
-            Runnable apiRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    callapis.Regulate(value, 30);
-                    try {
-                        Thread.sleep(250);
-                    }
-                    catch (Exception e) {}
-                }
-            };
-
-            Thread thread = new Thread(apiRunnable);
-            thread.start();
+        if(event.sensor.getType()==Sensor.TYPE_LIGHT) {
+            tvLux.setText("" + event.values[0]);
         }
     }
 
@@ -80,4 +70,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("isMyServiceRunning?", true+"");
+                return true;
+            }
+        }
+        Log.i ("isMyServiceRunning?", false+"");
+        return false;
+    }
 }
