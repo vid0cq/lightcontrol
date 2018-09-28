@@ -11,7 +11,7 @@ import java.net.URL;
 
 public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
-    protected boolean SendVslue(String value) {
+    protected boolean SendValue(String value) {
 
         Object[] result = doInBackground("http://192.168.0.109/lux?value=", value);
 
@@ -46,4 +46,14 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
             return null;
         }
     }
+
+
+    public void Regulate(double currValue, double expectedValue)
+    {
+        double correctValue = expectedValue + 5;
+        /*expectedValue += 5;*/
+
+        SendValue(Double.toString(correctValue));
+    }
+
 }
