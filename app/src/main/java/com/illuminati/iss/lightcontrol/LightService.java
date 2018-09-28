@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -109,15 +110,13 @@ public class LightService extends Service implements SensorEventListener {
 
             final Float value = event.values[0];
 
+            SharedPreferences settings = getSharedPreferences("BarValue", 0);
+            final String memoryString = settings.getString("BarValue", "10");
 
             Runnable apiRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    callAPIs.Regulate(value, 30);
-                    try {
-                        Thread.sleep(1000);
-                    }
-                    catch (Exception e) {}
+                    callAPIs.Regulate(value, Double.valueOf(memoryString));
                 }
             };
 
