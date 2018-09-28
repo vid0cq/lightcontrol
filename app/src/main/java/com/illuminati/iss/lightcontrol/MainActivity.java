@@ -10,11 +10,14 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     SensorManager sensorManager;
     Sensor sensor;
     TextView tvLux;
+    CallAPIs callapis = new CallAPIs();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         tvLux = (TextView) findViewById(R.id.tvLux);
         sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
 
 //        try{
 //            UDPClient.send();
@@ -51,6 +55,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(event.sensor.getType()==Sensor.TYPE_LIGHT)
         {
             tvLux.setText(""+event.values[0]);
+
+            final Float value = event.values[0];
+
+
+            Runnable apiRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    callapis.Regulate(value, 30);
+                }
+            };
+
+            Thread thread = new Thread(apiRunnable);
+            thread.start();
         }
     }
 
@@ -58,4 +75,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
 }

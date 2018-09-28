@@ -11,11 +11,52 @@ import java.net.URL;
 
 public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
-    protected boolean SendVslue(String value) {
+    private  double previousError = 0;
+    private  double dt = 0.2;
+
+
+    protected boolean SendValue(String value) {
 
         Object[] result = doInBackground("http://192.168.0.109/lux?value=", value);
 
         return true;
+    }
+
+    protected boolean AddValue(String value) {
+
+        Object[] result = doInBackground("http://192.168.0.109/add?step=", value);
+
+        return true;
+    }
+
+    protected boolean SubstractValue(String value) {
+
+        Object[] result = doInBackground("http://192.168.0.109/sub?step=", value);
+
+        return true;
+    }
+
+    public void Regulate(double currValue, double expectedValue)
+    {
+        double error = expectedValue-currValue;
+        double kp = 0.25;
+        double kd = 0;
+
+        double proportionalError = kp*error;
+        double derivativeError = kd*(error-previousError)/dt;
+        previousError = error;
+
+        double output = proportionalError+derivativeError;
+        if(output>100)
+        {
+            output=100;
+        }
+        else if(output<0)
+        {
+            output = 0;
+        }
+
+        SendValue(Double.toString(output));
     }
 
 
@@ -46,4 +87,8 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
             return null;
         }
     }
+
+
+
+
 }
