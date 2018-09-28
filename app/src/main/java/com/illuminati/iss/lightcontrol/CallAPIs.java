@@ -22,6 +22,43 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
         return true;
     }
 
+    protected boolean AddValue(String value) {
+
+        Object[] result = doInBackground("http://192.168.0.109/add?step=", value);
+
+        return true;
+    }
+
+    protected boolean SubstractValue(String value) {
+
+        Object[] result = doInBackground("http://192.168.0.109/sub?step=", value);
+
+        return true;
+    }
+
+    public void Regulate(double currValue, double expectedValue)
+    {
+        double error = expectedValue-currValue;
+        double kp = 0.25;
+        double kd = 0;
+
+        double proportionalError = kp*error;
+        double derivativeError = kd*(error-previousError)/dt;
+        previousError = error;
+
+        double output = proportionalError+derivativeError;
+        if(output>100)
+        {
+            output=100;
+        }
+        else if(output<0)
+        {
+            output = 0;
+        }
+
+        SendValue(Double.toString(output));
+    }
+
 
     @Override
     protected Object[] doInBackground(String... params) {
@@ -52,27 +89,6 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
     }
 
 
-    public void Regulate(double currValue, double expectedValue)
-    {
-        double error = expectedValue-currValue;
-        double kp = 0.25;
-        double kd = 0;
 
-        double proportionalError = kp*error;
-        double derivativeError = kd*(error-previousError)/dt;
-        previousError = error;
-
-        double output = proportionalError+derivativeError;
-        if(output>100)
-        {
-            output=100;
-        }
-        else if(output<0)
-        {
-            output = 0;
-        }
-
-        SendValue(Double.toString(output));
-    }
 
 }
