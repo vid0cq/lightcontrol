@@ -9,7 +9,22 @@ import java.util.Map;
 
 public class NetworkExplorer {
 
-    public static HashMap<String, String> retardedScan()
+    public String getAddressByHostName(String hostName)
+    {
+        String ipAddress;
+        try
+        {
+            ipAddress = InetAddress.getByName(hostName).getHostAddress();
+        }
+        catch (Exception e)
+        {
+            ipAddress = null;
+        }
+
+        return ipAddress;
+    }
+
+    public static HashMap<String, String> retardedScanNetwork()
     {
 
         int timeout=500;
