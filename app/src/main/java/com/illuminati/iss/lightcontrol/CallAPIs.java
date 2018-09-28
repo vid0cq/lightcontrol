@@ -11,6 +11,10 @@ import java.net.URL;
 
 public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
+    private  double previousError = 0;
+    private  double dt = 0.2;
+
+
     protected boolean SendValue(String value) {
 
         Object[] result = doInBackground("http://192.168.0.109/lux?value=", value);
@@ -50,10 +54,25 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
     public void Regulate(double currValue, double expectedValue)
     {
-        double correctValue = expectedValue + 5;
-        /*expectedValue += 5;*/
+        double error = expectedValue-currValue;
+        double kp = 0.25;
+        double kd = 0;
 
-        SendValue(Double.toString(correctValue));
+        double proportionalError = kp*error;
+        double derivativeError = kd*(error-previousError)/dt;
+        previousError = error;
+
+        double output = proportionalError+derivativeError;
+        if(output>100)
+        {
+            output=100;
+        }
+        else if(output<0)
+        {
+            output = 0;
+        }
+
+        SendValue(Double.toString(output));
     }
 
 }
