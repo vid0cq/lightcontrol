@@ -71,4 +71,12 @@
     </android.widget.RelativeLayout>
 
 
+    <TextView
+        android:id="@+id/tvLux"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        tools:layout_editor_absoluteX="162dp"
+        tools:layout_editor_absoluteY="88dp" />
+
 </android.support.constraint.ConstraintLayout>
