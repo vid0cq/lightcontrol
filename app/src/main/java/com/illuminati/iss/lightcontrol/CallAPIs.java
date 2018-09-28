@@ -13,7 +13,7 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
     private  double previousError = 0;
     private  double integralError = 0;
-    private  double dt = 0.25;
+    private  double dt = 1;
 
 
     protected boolean SendValue(String value) {
@@ -41,7 +41,7 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
     {
         double error = expectedValue-currValue;
         double kp = 1;
-        double kd = 0.1;
+        double kd = 0.25;
         double ki = 0.5;
 
         double proportionalError = kp*error;
@@ -54,6 +54,15 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
 
         double output = proportionalError+derivativeError +intError;
 
+        if(integralError>300)
+        {
+            integralError=200;
+        }
+        else if(integralError<-300)
+        {
+            integralError = -200;
+        }
+
         if(output>100)
         {
             output=100;
@@ -63,7 +72,7 @@ public class CallAPIs extends AsyncTask<String, Integer, Object[]> {
             output = 0;
         }
 
-        Log.e("LUMEN", String.valueOf(output));
+        Log.e("LUMEN", String.valueOf(output) +"  Integral error:"+String.valueOf(integralError));
 
         SendValue(Double.toString(output));
     }
