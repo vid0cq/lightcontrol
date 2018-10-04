@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     SensorManager sensorManager;
     Sensor sensor;
     TextView tvLux;
+    TextView tvDesiredLux;
     LightService lightService;
     Intent ligthServiceIntent;
     ImageView imageView;
@@ -33,25 +34,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SeekBar seekBar = findViewById(R.id.seekBar);
-        seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
-
         imageView = (ImageView)findViewById(R.id.imageView4);
-
         lightService = new LightService(this);
         ligthServiceIntent = new Intent(this,lightService.getClass());
         tvLux = (TextView) findViewById(R.id.tvLux);
+        tvDesiredLux = (TextView) findViewById(R.id.tvDesiredLux);
         sensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
         if(!isMyServiceRunning(lightService.getClass()))
             startService(ligthServiceIntent);
 
+        SeekBar seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                Toast.makeText(getApplicationContext(), "Changing seekbar's progress", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Changing seekbar's progress", Toast.LENGTH_SHORT).show();
+                tvDesiredLux.setText(progress + " lx");
+
+                // updated continuously as the user slides the thumb
+                if ( progress < 40)
+                    imageView.setImageResource(R.drawable.sun1);
+                if ( progress >= 40)
+                    imageView.setImageResource(R.drawable.sun2);
+                if ( progress >= 100)
+                    imageView.setImageResource(R.drawable.sun2);
 
                 SharedPreferences settingsWr = getSharedPreferences("BarValue", 0);
                 SharedPreferences.Editor editor = settingsWr.edit();
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         if(event.sensor.getType()==Sensor.TYPE_LIGHT) {
-            tvLux.setText("" + event.values[0]);
+            tvLux.setText("" + event.values[0] + " lx");
         }
     }
 
@@ -114,28 +122,4 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.i ("isMyServiceRunning?", false+"");
         return false;
     }
-
-    SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            // updated continuously as the user slides the thumb
-            if ( progress < 40)
-                imageView.setImageResource(R.drawable.sun1);
-            if ( progress >= 40)
-                imageView.setImageResource(R.drawable.sun2);
-            if ( progress >= 100)
-                imageView.setImageResource(R.drawable.sun2);
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-            // called when the user first touches the SeekBar
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            // called after the user finishes moving the SeekBar
-        }
-    };
 }
